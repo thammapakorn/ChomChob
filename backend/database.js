@@ -1,0 +1,99 @@
+const { INTEGER } = require("sequelize")
+const { sequelize, Sequelize } = require("./config/db")
+
+//Customer Table
+const customer_Table = sequelize.define('customer_tb',{
+    id: Sequelize.INTEGER,
+    customer_name: Sequelize.STRING,
+    customer_phone: Sequelize.STRING,
+    customer_address: Sequelize.STRING
+})
+
+//Product Table
+const products_Table = sequelize.define('products_tb',{
+    id: Sequelize.INTEGER,
+    code_id: Sequelize.STRING,
+    product_name: Sequelize.STRING,
+    product_detail: Sequelize.STRING,
+    product_price: Sequelize.DECIMAL(10,2),
+    product_item: Sequelize.INTEGER,
+    startdate: Sequelize.DATETIME,
+    expiredate: Sequelize.DATETIME
+})
+
+//Customer Products Table
+const customer_products_Table = sequelize.define('customer_products_tb',{
+    id: Sequelize.INTEGER,
+    customer_id: Sequelize.INTEGER,
+    product_id: Sequelize.INTEGER,
+    promotion_id: Sequelize.INTEGER,
+    bundle_id: Sequelize.INTEGER,
+    code_id: Sequelize.STRING,
+    discount_price: Sequelize.DECIMAL(10,2),
+    total_price: Sequelize.DECIMAL(10,2)
+})
+
+//Promotion Table
+const promotion_Table = sequelize.define('promotion_tb',{
+    id: Sequelize.INTEGER,
+    startdate: Sequelize.DATETIME,
+    expiredate: Sequelize.DATETIME,
+    discount_price: Sequelize.DECIMAL(10,2)
+})
+
+//Bundle Table
+const bundle_Table = sequelize.define('bundle_tb',{
+    id: Sequelize.INTEGER,
+    bundle_products_id: Sequelize.INTEGER,
+    bundle_price: Sequelize.DECIMAL(10,2),
+    startdate: Sequelize.DATETIME,
+    expiredate: Sequelize.DATETIME
+})
+
+//Bundle Products Table
+const bundle_products_Table = sequelize.define('bundle_products_tb',{
+    id: Sequelize.INTEGER,
+    product_id: Sequelize.INTEGER,
+    bundle_name: Sequelize.STRING,
+    quantity: Sequelize.INTEGER
+})
+
+
+//customer_tb && products_tb hasMany customer_products_tb 
+db.customer_Table.hasMany(db.customer_products_Table,{sourceKey:'id',foreignKey:'customer_id'})
+db.products_Table.hasMany(db.customer_products_Table,{sourceKey:'id',foreignKey:'product_id'})
+db.customer_products_Table.belongTo(db.customer_Table,{foreignKey:'customer_id',targetKey: 'id'})
+db.customer_products_Table.belongTo(db.products_Table,{foreignKey:'product_id',targetKey: 'id'})
+
+//productstb hasMany bundle_products_tb
+db.products_Table.hasMany(db.bundle_products_Table,{sourceKey:'id',foreignKey:'product_id'})
+db.bundle_products_Table.belongTo(db.products_Table,{sourceKey:'id',foreignKey:'product_id'})
+
+//bundle_tb hasMany bundle_products_tb
+db.bundle_Table.hasMany(db.bundle_products_Table,{sourceKey:'id',foreignKey:'bundle_products_id'})
+db.bundle_products_Table.belongTo(db.bundle_Table,{foreignKey:'bundle_id',targetKey: 'id'})
+
+//bundle_tb hasMany customer_products_tb
+db.bundle_Table.hasMany(db.customer_products_Table,{sourceKey:'id',foreignKey:'bundle_id'})
+db.customer_products_Table.belongsTo(db.bundle_Table, { foreignKey: 'bundle_id', targetKey: 'id' });
+
+//promotion_tb hasMany customer_products_tb
+db.promotion_Table.hasMany(db.customer_products_Table,{sourceKey:'id',foreignKey:'promotion_id'})
+db.customer_products_Table.belongsTo(db.promotion_Table, { foreignKey: 'promotion_id', targetKey: 'id' });
+
+/*
+รายละเอียดอธิบายว่าทำไมถึงออกแบบ Database ออกมาแบบนี้
+
+สร้างตารางชื่อ customer_Table เก็บข้อมูล id, ชื่อผู้ซื้อ, เบอร์โทรผู้ซื้อ, ที่อยู่ผู้ซื้อ
+สร้างตารางชื่อ products_Table เก็บข้อมูล id, code_id, ชื่อสินค้า, รายละเอียดสินค้า, ราคาสินค้า, จำนวนสินค้า, วันที่ขาย, วันที่สิ้นสุดการขาย
+ตารางชื่อ customer_products_Table จะถูกสร้างขึ้น หลังจาก ผู้ซื้อสินค้าได้ทำการสร้างรายการสินค้า (require customer_id จาก customer_Table และ product_id จาก products_Table) เก็บข้อมูล id, idผู้ซื้อ, idสินค้า, idโปรโมชั่น, idbundle, ส่วนลดราคา, ราคารวม, code_id
+
+สร้างตารางชื่อ promotion_Table เก็บข้อมูล id, ส่วนลดราคา, เก็บข้อมูลวันที่จัดโปร, วันที่สิ้นสุดโปร
+ตารางชื่อ customer_products_Table สามารถนำข้อมูลใน promotion_Table มาใช้หรือไม่ใช้ก็ได้ โดยใช้จาก promotion_id (optional)  
+
+สร้างตารางชื่อ bundle_products_Table เก็บข้อมูล id, product_id จาก products_Table(เป็นความสัมพัมธ์แบบ 1toMany เพราะ products_Table สามารถนำมาใช้ได้หลายรายการ ), ชื่อbundle, จำนวน bundle 
+สร้างตารางชื่อ bundle_Table เก็บข้อมูล id, bundle_products_id จาก bundle_products_Table (เป็นความสัมพันธ์แบบ 1toMany เพราะ bundle_products_id  สามารถนำมาใช้ได้หลายรายการ), วันที่เริ่มขาย, วันที่สิ้นสุดการขาย, ราคาbundle
+ตารางชื่อ customer_products_Table สามารถนำข้อมูลในbundle_Table มาใช้หรือไม่ใช้ก็ได้ โดยใช้จาก bundle_id (optional)
+*/
+
+
