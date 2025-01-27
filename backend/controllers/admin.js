@@ -43,7 +43,7 @@ exports.remove_user = async (req, res) => {
     res.status(200).send(added);
   } catch (err) {
     console.log(err);
-    res.status(422).send("Invalid data");
+    res.status(400).send("Invalid data");
   }
 };
 //usertb
@@ -63,7 +63,7 @@ exports.update_user = async (req, res) => {
     res.status(200).send("Edit item Success");
   } catch (err) {
     console.log(err);
-    res.status(414).send("Can't update data");
+    res.status(400).send("Can't update data");
   }
 };
 
@@ -105,7 +105,7 @@ exports.update_balance = async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    res.status(414).send("Can't update data");
+    res.status(500).send("Can't update data");
   }
 };
 
@@ -134,7 +134,7 @@ exports.increase_balance = async (req, res) => {
     // console.log(crytoid)
   } catch (err) {
     console.log(err);
-    res.status(414).send("Can't increase data");
+    res.status(500).send("Can't increase data");
   }
 };
 
@@ -156,7 +156,7 @@ exports.total_balance = async (req, res) => {
     send({ data: balance, message: "Total Balance" });
   } catch(err) {
     console.log(err);
-    res.status(414).send("Can't total balance data");
+    res.status(500).send("Can't total balance data");
   }
 };
 
@@ -178,11 +178,11 @@ exports.add_crypto  = async (req, res) => {
         .status(200)
         .send({ data: increase, message: "Increase Balance Success" });
     } else {
-      res.status(400).send("You're not admin or User already have this coins");
+      res.status(500).send("You're not admin or User already have this coins");
     }
   } catch (err) {
     console.log(err);
-    res.status(414).send("Can't increase data");
+    res.status(500).send("Can't increase data");
   }
 };
 
@@ -206,6 +206,6 @@ exports.update_exchange_rate = async (req, res) => {
     }
   }catch (err) {
     console.log(err);
-    res.status(414).send("Can't update data");
+    res.status(500).send("Can't update data");
   }
 };
